@@ -1,6 +1,6 @@
 async function generatePair() {
     const number = document.getElementById('number').value.trim();
-    if (!number) return alert('Please enter your number');
+    if (!number) return alert('Please enter your WhatsApp number');
 
     const res = await fetch('/generate-pair', {
         method: 'POST',
@@ -14,8 +14,21 @@ async function generatePair() {
     if (data.error) {
         resultDiv.innerHTML = `<p style="color:red">${data.error}</p>`;
     } else {
-        resultDiv.innerHTML = `<p>✅ Pairing code generated:</p>
-                               <p style="font-size: 1.5rem; font-weight: bold;">${data.pairCode}</p>
-                               <p>Send this code from your WhatsApp to link your account.</p>`;
+        resultDiv.innerHTML = `
+            <p>✅ Pairing code generated:</p>
+            <div class="code-container">
+                <input type="text" id="pairCode" value="${data.pairCode}" readonly>
+                <button onclick="copyCode()">Copy Code</button>
+            </div>
+            <p>Send this code via WhatsApp to your bot to link your account.</p>
+        `;
     }
+}
+
+function copyCode() {
+    const codeInput = document.getElementById('pairCode');
+    codeInput.select();
+    codeInput.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    alert('Pairing code copied!');
 }
