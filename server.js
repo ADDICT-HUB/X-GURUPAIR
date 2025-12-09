@@ -1,12 +1,20 @@
 const express = require('express');
 const crypto = require('crypto');
+const path = require('path');
 const app = express();
 
 app.use(express.static('public'));
 app.use(express.json());
 
+// Sessions storage
 let sessions = {}; // { sessionId: { number, createdAt } }
 
+// Serve root page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Pairing endpoint
 app.post('/pair', (req, res) => {
     const { number } = req.body;
 
@@ -20,6 +28,7 @@ app.post('/pair', (req, res) => {
     res.json({ sessionId, whatsappLink });
 });
 
+// Optional: view all sessions
 app.get('/sessions', (req, res) => {
     res.json(sessions);
 });
