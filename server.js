@@ -1,25 +1,46 @@
 const express = require('express');
 const crypto = require('crypto');
+const path = require('path');
 const app = express();
 
 app.use(express.static('public'));
 app.use(express.json());
 
-let sessions = {}; // { sessionId: { number, createdAt } }
+let pairingCodes = {}; // { code: number }
+let sessions = {};     // { sessionId: number }
 
-app.post('/pair', (req, res) => {
-    const { number } = req.body;
-
-    if (!number) return res.status(400).json({ error: 'Number is required' });
-
-    const sessionId = crypto.randomBytes(6).toString('hex');
-    sessions[sessionId] = { number, createdAt: Date.now() };
-
-    const whatsappLink = `https://wa.me/${number}?text=PAIR_${sessionId}`;
-
-    res.json({ sessionId, whatsappLink });
+// Serve root page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Generate pairing code
+app.post('/generate-pair', (req, res) => {
+    const { number } = req.body;
+    if (!number) return res.status(400).json({ error: 'Number required' });
+
+    const pairCode = crypto.randomBytes(3).toString('hex').toUpperCase();
+    pairingCodes[pairCode] = number;
+
+    res.json({ pairCode });
+});
+
+// Verify pairing code (called by your bot after receiving the code via WhatsApp)
+app.post('/verify-pair', (req, res) => {
+    const { pairCode } = req.body;
+    const number = pairingCodes[pairCode];
+
+    if (!number) return res.status(400).json({ error: 'Invalid pairing code' });
+
+    const sessionId = crypto.randomBytes(6).toString('hex');
+    sessions[sessionId] = number;
+
+    delete pairingCodes[pairCode]; // Remove used code
+
+    res.json({ sessionId });
+});
+
+// Optional: view all sessions
 app.get('/sessions', (req, res) => {
     res.json(sessions);
 });
