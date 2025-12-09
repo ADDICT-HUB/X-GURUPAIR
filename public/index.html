@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X-GURU WhatsApp Pairing</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>X-GURU WhatsApp Bot Pairing</h1>
+<p>Enter your WhatsApp number to generate a pairing link:</p>
+<input type="text" id="number" placeholder="254700000000" />
+<button onclick="generatePair()">Generate Link</button>
+<div id="result"></div>
+
+<script>
+async function generatePair() {
+    const number = document.getElementById('number').value.trim();
+    if (!number) {
+        alert('Please enter a number');
+        return;
+    }
+
+    const res = await fetch('/pair', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ number })
+    });
+
+    const data = await res.json();
+    const resultDiv = document.getElementById('result');
+    if (data.error) {
+        resultDiv.innerHTML = `<p style="color:red">${data.error}</p>`;
+    } else {
+        resultDiv.innerHTML = `<p>✅ Pairing link generated:</p>
+                               <a href="${data.whatsappLink}" target="_blank">${data.whatsappLink}</a>
+                               <p>Session ID: ${data.sessionId}</p>`;
+    }
+}
+</script>
+</body>
+</html>
