@@ -58,9 +58,3 @@ button:hover {
     margin-top: 15px;
     word-break: break-word;
 }
-
-#result a {
-    color: #FFD700;
-    text-decoration: none;
-    font-weight: bold;
-}
