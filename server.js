@@ -19,13 +19,13 @@ app.post('/generate-pair', (req, res) => {
     const { number } = req.body;
     if (!number) return res.status(400).json({ error: 'Number required' });
 
-    const pairCode = crypto.randomBytes(3).toString('hex').toUpperCase();
+    const pairCode = 'PAIR_' + crypto.randomBytes(3).toString('hex').toUpperCase();
     pairingCodes[pairCode] = number;
 
     res.json({ pairCode });
 });
 
-// Verify pairing code (called by your bot after receiving the code via WhatsApp)
+// Verify pairing code (called by bot)
 app.post('/verify-pair', (req, res) => {
     const { pairCode } = req.body;
     const number = pairingCodes[pairCode];
